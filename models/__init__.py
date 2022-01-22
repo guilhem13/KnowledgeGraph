@@ -1,0 +1,1 @@
+from .papermodel import Papier
