@@ -14,7 +14,7 @@ class Papier():
         self.title = title,
         self.authors = authors,
         self.link = link,
-        self.summary = summary
+        self.summary = summary,
         self.entities_from_reference = None,
         self.entities_include_in_text=None, 
         self.subject = None

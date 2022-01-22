@@ -1,6 +1,6 @@
 from nltk.tag import StanfordNERTagger, StanfordPOSTagger
-PATH_TO_JAR='stanford-ner.jar'
-PATH_TO_MODEL = 'english.muc.7class.distsim.crf.ser.gz'
+PATH_TO_JAR='./rawnlpmodel/stanford-ner.jar'
+PATH_TO_MODEL = './rawnlpmodel/english.muc.7class.distsim.crf.ser.gz'
 stner = StanfordNERTagger(PATH_TO_MODEL,PATH_TO_JAR,encoding='utf-8')
 
 def get_continuous_chunks(string):

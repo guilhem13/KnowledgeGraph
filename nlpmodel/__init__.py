@@ -1,1 +1,1 @@
-from .nltkmodel import nltktreelist , get_continuous_chunks
+#from .nltkmodel import nltktreelist , get_continuous_chunks
