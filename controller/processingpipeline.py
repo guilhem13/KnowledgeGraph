@@ -29,13 +29,20 @@ class Textprocessed():
         temp = temp.replace("\n"," ") #rajout d'espace 
         return temp
 
+    def find_entities_in_raw_text(self): 
+        
+        named_re = re.compile("(?:\(|\[)((?:[ a-zA-Z\.,\n-]+(?:\(|\[)*(?:19|20)[0-9]{2}(?:\)|\])*[; \n]*)+)(?:\)|\])")
+        result = named_re.findall(self.raw_text)
+        return result
+
+
     def get_data_from_pdf(self):
 
         ##
         pdf = pdfx.PDFx(self.url)
-        metadata = pdf.get_metadata()
-        references_list = pdf.get_references()
-        references_dict = pdf.get_references_as_dict()
+        #metadata = pdf.get_metadata()
+        #references_list = pdf.get_references()
+        #references_dict = pdf.get_references_as_dict()
         ###
         textfrompdf = pdf.get_text()
         self.raw_text = textfrompdf
