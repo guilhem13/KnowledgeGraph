@@ -1,6 +1,7 @@
-from nltk.tag import StanfordNERTagger, StanfordPOSTagger
-PATH_TO_JAR='./rawnlpmodel/stanford-ner.jar'
-PATH_TO_MODEL = './rawnlpmodel/english.muc.7class.distsim.crf.ser.gz'
+from nltk.tag import StanfordNERTagger#, StanfordPOSTagger
+
+PATH_TO_JAR='nlpmodel/rawnlpmodel/stanford-ner.jar'
+PATH_TO_MODEL = 'nlpmodel/rawnlpmodel/english.muc.7class.distsim.crf.ser.gz'
 stner = StanfordNERTagger(PATH_TO_MODEL,PATH_TO_JAR,encoding='utf-8')
 
 def get_continuous_chunks(string):
@@ -27,6 +28,7 @@ def get_continuous_chunks(string):
             for n in m.strip().split(","):
                 if len(n)>0:
                     persons.append(n.strip("*"))
+    """               
     organizations = []
     for l in [l.split(",") for l,m in named_entities_str_tag if m == "ORGANIZATION"]:
         for m in l:
@@ -65,11 +67,11 @@ def get_continuous_chunks(string):
             for n in m.strip().split(","):
                 if len(n)>0:
                     money.append(n.strip("*"))
-
+    """
     entities={}
     entities['persons']= persons
-    entities['organizations']= organizations
-    entities['locations']= locations
+    ##entities['organizations']= organizations
+    ##entities['locations']= locations
     #entities['dates']= dates
     #entities['money']= money
     #entities['time']= time

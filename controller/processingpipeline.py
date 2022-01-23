@@ -12,7 +12,7 @@ class Textprocessed():
     def get_references_part(self,Pdf_Readed):
         result=""
         temp = unicodedata.normalize('NFKD',Pdf_Readed).encode('ascii','ignore').decode('unicode_escape').encode('ascii','ignore').decode()
-        keyword_list = ['\nReferences\n', '\nREFERENCES\n','\nreferences\n']
+        keyword_list = ['\nReferences\n', '\nREFERENCES\n','\nreferences\n','REFERENCES'] #TODO voir car parfois la traduction pdf to text engendre des porblèmes comme => n\n\x0cREFERENCES \n[1]
         keyword = [ele for ele in keyword_list if(ele in temp)]
         if keyword != None:
             if len(keyword) == 1: 

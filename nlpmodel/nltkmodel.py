@@ -11,9 +11,9 @@ def nltktreelist(text):
     text = text    
     
     persons = []
-    organizations = []
-    locations =[]
-    genpurp = []
+    #organizations = []
+    #locations =[]
+    #genpurp = []
 
     for l in nltk.ne_chunk(nltk.pos_tag(nltk.word_tokenize(text))):
         if isinstance(l,nltk.tree.Tree):
@@ -29,7 +29,7 @@ def nltktreelist(text):
                     else:
                         persons.append(" ".join(map(itemgetter(0), l)).strip("*"))
    
-
+    """
     for o in nltk.ne_chunk(nltk.pos_tag(nltk.word_tokenize(text))):
         if isinstance(o,nltk.tree.Tree):
             if o.label() == 'ORGANIZATION':
@@ -74,12 +74,12 @@ def nltktreelist(text):
                         genpurp.append(" ".join(map(itemgetter(0), o)).strip("*"))
                         
        
-
+    """
 
     results = {}
     results['persons']=persons
-    results['organizations']=organizations
-    results['locations']=locations
-    results['genpurp'] = genpurp
+    #results['organizations']=organizations
+    #results['locations']=locations
+    #results['genpurp'] = genpurp
     
     return results
