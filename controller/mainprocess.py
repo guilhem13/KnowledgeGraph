@@ -3,7 +3,10 @@ from unittest import result
 from controller import Data , Textprocessed
 from nlpmodel import nltkmodel , standfordnermodel
 import json
+import redis 
 
+redis_host = "localhost"
+redis_port = 6379
 
 class Pipeline(): 
 
@@ -20,10 +23,19 @@ class Pipeline():
         return resultList
 
         #TODO A voir les modèles ne marche
+    def redis_string(self):
+        try: 
+            r = redis.StrictRedis(host = redis_host,port = redis_port, decode_responses=True)
+            r.set("message","Hello_World")
+            msg =r.get("message")
+            print(msg)
+        except Exception as e: 
+            print(e)
 
 
     def make_traitement_pipeline(self): #https://export.arxiv.org/pdf/
         arxiv_data = Data.get_set_data()
+        self.redis_string()
         f = open("test.json", "a")
         for i in range(len(arxiv_data)):
 
@@ -36,3 +48,4 @@ class Pipeline():
         f.close()
         return True
 #TODO faire le multi threading https://ichi.pro/fr/multithreading-en-python-et-comment-y-parvenir-28270357503503
+#https://www.toptal.com/python/beginners-guide-to-concurrency-and-parallelism-in-python#:~:text=Multithreading%20(sometimes%20simply%20%22threading%22,a%20thread%20to%20be%20completed.

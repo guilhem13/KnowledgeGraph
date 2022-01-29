@@ -16,7 +16,7 @@ def get_continuous_chunks(string):
             if current_chunk: # if the current chunk is not empty
                 continuous_chunk.append(current_chunk)
                 current_chunk = []
-    # Flush the final current_chunk into the continuous_chunk, if any.
+    
     if current_chunk:
         continuous_chunk.append(current_chunk)
     named_entities = continuous_chunk
@@ -28,53 +28,8 @@ def get_continuous_chunks(string):
             for n in m.strip().split(","):
                 if len(n)>0:
                     persons.append(n.strip("*"))
-    """               
-    organizations = []
-    for l in [l.split(",") for l,m in named_entities_str_tag if m == "ORGANIZATION"]:
-        for m in l:
-            for n in m.strip().split(","):
-                n.strip("*")
-                if len(n)>0:
-                    organizations.append(n.strip("*"))
-    locations = []
-    for l in [l.split(",") for l,m in named_entities_str_tag if m == "LOCATION"]:
-        for m in l:
-            for n in m.strip().split(","):
-                if len(n)>0:
-                    locations.append(n.strip("*"))
-    dates = []
-    for l in [l.split(",") for l,m in named_entities_str_tag if m == "DATE"]:
-        for m in l:
-            for n in m.strip().split(","):
-                if len(n)>0:
-                    dates.append(n.strip("*"))
-    money = []
-    for l in [l.split(",") for l,m in named_entities_str_tag if m == "MONEY"]:
-        for m in l:
-            for n in m.strip().split(","):
-                if len(n)>0:
-                    money.append(n.strip("*"))
-    time = []
-    for l in [l.split(",") for l,m in named_entities_str_tag if m == "TIME"]:
-        for m in l:
-            for n in m.strip().split(","):
-                if len(n)>0:
-                    money.append(n.strip("*"))
-                    
-    percent = []
-    for l in [l.split(",") for l,m in named_entities_str_tag if m == "PERCENT"]:
-        for m in l:
-            for n in m.strip().split(","):
-                if len(n)>0:
-                    money.append(n.strip("*"))
-    """
+ 
     entities={}
     entities['persons']= persons
-    ##entities['organizations']= organizations
-    ##entities['locations']= locations
-    #entities['dates']= dates
-    #entities['money']= money
-    #entities['time']= time
-    #entities['percent']= percent
     
     return entities
