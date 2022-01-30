@@ -10,20 +10,23 @@ redis_host = "localhost"
 redis_port = 6379
 
 
-class Pipeline(): 
+class Pipeline():
 
-    def __init__(self,arxiv_url):
+    start=None 
+
+    def __init__(self,arxiv_url,start):
         self.arxiv_url = arxiv_url
+        self.start =start
         pass
     
     def get_references(self, textprocessed): 
 
         nltkresult = nltkmodel.nltktreelist(textprocessed)["persons"]
-        Standfordresult = standfordnermodel.get_continuous_chunks(textprocessed)["persons"]
-        resultList= list(set(nltkresult) | set(Standfordresult))
-        resultList = [x for x in resultList if len(x)>1 ]
-        #return nltkresult
-        return resultList
+        #Standfordresult = standfordnermodel.get_continuous_chunks(textprocessed)["persons"]
+        #resultList= list(set(nltkresult) | set(Standfordresult))
+        #resultList = [x for x in nltkresult if len(x)>1 ]
+        return nltkresult
+        #return resultList
 
         #TODO A voir les modèles ne marche pas 
     def redis_string(self):
@@ -41,11 +44,15 @@ class Pipeline():
             text_processed = processor.get_data_from_pdf()
             item.entities_include_in_text = processor.find_entities_in_raw_text()
             item.entities_from_reference = self.get_references(text_processed)
-        except:
+        except Exception as e:
+            print(e)
             print('error with item')
-    
+    #TODO 
+    #https://docs.python.org/2/library/multiprocessing.html#using-a-pool-of-workers
+    #https://stackoverflow.com/questions/15143837/how-to-multi-thread-an-operation-within-a-loop-in-python
+
     def multi_threading(self,pool_size):
-        arxiv_data = Data.get_set_data()
+        arxiv_data = Data.get_set_data(self.start)
         pool = Pool(pool_size)
         for item in arxiv_data:
             pool.apply_async(self.worker, (item,))
@@ -58,7 +65,7 @@ class Pipeline():
         return True#arxiv_data
 
     def make_traitement_pipeline(self): #https://export.arxiv.org/pdf/
-        arxiv_data = Data.get_set_data()
+        arxiv_data = Data.get_set_data(self.start)
         f = open("test.json", "a")
         for i in range(len(arxiv_data)):
             processor = Textprocessed(arxiv_data[i].link[0])            
