@@ -1,6 +1,6 @@
 from nltk.tag import StanfordNERTagger#, StanfordPOSTagger
 
-PATH_TO_JAR='nlpmodel/rawnlpmodel/stanford-ner.jar'
+PATH_TO_JAR='nlpmodel/rawnlpmodel/stanford-ner-4.2.0.jar'
 PATH_TO_MODEL = 'nlpmodel/rawnlpmodel/english.muc.7class.distsim.crf.ser.gz'
 stner = StanfordNERTagger(PATH_TO_MODEL,PATH_TO_JAR,encoding='utf-8')
 

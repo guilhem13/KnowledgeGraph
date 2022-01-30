@@ -1,3 +1,4 @@
+from redis_om import HashModel
 
 class Papier():
 
@@ -15,5 +16,6 @@ class Papier():
         self.authors = authors,
         self.link = link,
         self.summary = summary
-    
-        
+   
+
+
