@@ -7,10 +7,10 @@ from bs4 import BeautifulSoup
 class Data(): 
 
     def get_set_data(start):
-        Base_Url ="https://arxiv.org"
-        #template = "https://arxiv.org/pdf/cs/"
+        """Base_Url ="https://arxiv.org"
+        #template = "https://arxiv.org/pdf/cs/" #TODO faire une liste de template pour que ça marche sinon trop ou sinon passer par ARxvi.search 
         paper_list= []
-        max_results = 4000 #00
+        max_results = 10#00
         page = urllib.request.urlopen('https://export.arxiv.org/api/query?search_query=cat:cs.AI&start='+str(start)+'&max_results='+str(max_results))
         s = page.read()
         tree = ElementTree(fromstring(s))
@@ -51,7 +51,7 @@ class Data():
         return paper_list
         """
         #TODO for redis 
-        """ 
+        
         client_arxiv = arxiv.Client(page_size =4000,delay_seconds = 3,num_retries = 5)
         for result in client_arxiv.results(arxiv.Search(query = "cat:cs.AI",max_results =float('inf'),sort_by = arxiv.SortCriterion.SubmittedDate,)):
             Papier(result.title,str(result.authors),result.pdf_url,result.summary,"","","").save()

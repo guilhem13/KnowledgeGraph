@@ -1,10 +1,13 @@
 from pickle import TRUE
 from unittest import result
 from controller import Data , Textprocessed
-from nlpmodel import nltkmodel , standfordnermodel
-from multiprocessing.pool import ThreadPool as Pool
+from nlpmodel import nltkmodel , standfordnermodel ,spacymodel
+from multiprocessing.pool import ThreadPool as Pool #TODO A enlever 
 import json
 import redis 
+from multiprocessing import Process
+import multiprocessing as mp
+
 
 redis_host = "localhost"
 redis_port = 6379
@@ -22,11 +25,13 @@ class Pipeline():
     def get_references(self, textprocessed): 
 
         nltkresult = nltkmodel.nltktreelist(textprocessed)["persons"]
-        #Standfordresult = standfordnermodel.get_continuous_chunks(textprocessed)["persons"]
-        #resultList= list(set(nltkresult) | set(Standfordresult))
-        #resultList = [x for x in nltkresult if len(x)>1 ]
-        return nltkresult
-        #return resultList
+        Standfordresult = standfordnermodel.get_continuous_chunks(textprocessed)["persons"]
+        #spacyresult = spacymodel.spacylist(textprocessed)
+        resultList= list(set(nltkresult) | set(Standfordresult))
+        #resultList = list(set(resultList) | set(spacyresult))
+        resultList = [x for x in nltkresult if len(x)>1 ]
+        #return nltkresult
+        return resultList
 
         #TODO A voir les modèles ne marche pas 
     def redis_string(self):
@@ -50,7 +55,7 @@ class Pipeline():
     #TODO 
     #https://docs.python.org/2/library/multiprocessing.html#using-a-pool-of-workers
     #https://stackoverflow.com/questions/15143837/how-to-multi-thread-an-operation-within-a-loop-in-python
-
+    
     def multi_threading(self,pool_size):
         arxiv_data = Data.get_set_data(self.start)
         pool = Pool(pool_size)
@@ -62,8 +67,9 @@ class Pipeline():
         for i in range(len(arxiv_data)):
             f.write(json.dumps(arxiv_data[i].__dict__))
         f.close()
-        return True#arxiv_data
+        return True#arxiv_data"""
 
+    """
     def make_traitement_pipeline(self): #https://export.arxiv.org/pdf/
         arxiv_data = Data.get_set_data(self.start)
         f = open("test.json", "a")
@@ -76,6 +82,33 @@ class Pipeline():
             f.write(json.dumps(arxiv_data[i].__dict__))
         f.close()
         return True
+    """
+###########################################################################################################
+    def multi_process(self, data, out_queue):         
+        processor = Textprocessed(data.link[0])            
+        text_processed = processor.get_data_from_pdf()
+        data.entities_include_in_text = processor.find_entities_in_raw_text()
+        data.entities_from_reference = self.get_references(text_processed)
+        out_queue.put(data)
 
-#TODO faire le multi threading https://ichi.pro/fr/multithreading-en-python-et-comment-y-parvenir-28270357503503
-#https://www.toptal.com/python/beginners-guide-to-concurrency-and-parallelism-in-python#:~:text=Multithreading%20(sometimes%20simply%20%22threading%22,a%20thread%20to%20be%20completed.
+    def make_traitement_pipeline(self,out_queue): 
+        arxiv_data = Data.get_set_data(self.start)
+        workers = [ mp.Process(target=self.multi_process, args=(ele, out_queue) ) for ele in arxiv_data ]
+
+        for work in workers: work.start()
+        for work in workers: work.join(timeout=3)
+
+        res_lst = []
+        for j in range(len(workers)):
+            res_lst.append(out_queue.get())
+
+        f = open("test.json", "a")
+        for test in res_lst: 
+            f.write(json.dumps(test.__dict__))
+        f.close()
+     # TODO récolter le nombre de coeur pour ensuite le mettre sur le code
+     # gérer le problème quand c'est 10000  
+
+    out_queue = mp.Queue()
+
+    
