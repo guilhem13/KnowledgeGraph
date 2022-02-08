@@ -99,9 +99,10 @@ class Pipeline():
     def make_traitement_pipeline(self,out_queue): 
         arxiv_data = Data.get_set_data(self.start)
         res_lst = []
-        for i in range(0,len(arxiv_data),10):
+        f = open("test.json", "a")
+        for i in range(0,len(arxiv_data),20):
             print(i)
-            temp =arxiv_data[i:i+10]
+            temp =arxiv_data[i:i+20]
             workers = [ mp.Process(target=self.multi_process, args=(ele, out_queue) ) for ele in temp]
             #s = threading.Semaphore(4)
             for work in workers:
@@ -111,11 +112,11 @@ class Pipeline():
 
             #res_lst = []
             for j in range(len(workers)):
-                res_lst.append(out_queue.get())
+                #res_lst.append(out_queue.get())
+                f.write(json.dumps(out_queue.get().__dict__))
 
-        f = open("test.json", "a")
-        for test in res_lst: 
-            f.write(json.dumps(test.__dict__))
+        #for test in res_lst: 
+        #   f.write(json.dumps(test.__dict__))
         f.close()
      # TODO récolter le nombre de coeur pour ensuite le mettre sur le code
      # gérer le problème quand c'est 10000  

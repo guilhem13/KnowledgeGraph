@@ -204,7 +204,7 @@ class PDFMinerBackend(ReaderBackend):
             metadata = resolve1(doc.catalog["Metadata"]).get_data()
             # print(metadata)  # The raw XMP metadata
             # print(xmp_to_dict(metadata))
-            self.metadata.update(xmp_to_dict(metadata))
+            #self.metadata.update(xmp_to_dict(metadata))
             # print("---")
 
         # Extract Content

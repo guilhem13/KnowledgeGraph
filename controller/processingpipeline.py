@@ -1,6 +1,6 @@
 import unicodedata
 import re 
-import pdfx
+from .pdfx import PDFx
 
 class Textprocessed(): 
     url = None
@@ -20,7 +20,8 @@ class Textprocessed():
                 index = temp.index(keyword) # check ici parcequ'il y a plusieurs versions de références 
                 result = temp[index +len(keyword):]
                 return result
-            else: 
+            else:
+                print(keyword) 
                 return "erreur problème: Plusieurs références ! " #TODO enlever cette partie non disruptive 
 
     def clean_references_part(self,data):
@@ -39,7 +40,8 @@ class Textprocessed():
     def get_data_from_pdf(self):
 
         ##
-        pdf = pdfx.PDFx(self.url)
+        #pdf = pdfx.PDFx(self.url)
+        pdf = PDFx(self.url)
         #metadata = pdf.get_metadata()
         #references_list = pdf.get_references()
         #references_dict = pdf.get_references_as_dict()
