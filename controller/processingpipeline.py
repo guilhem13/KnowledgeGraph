@@ -33,8 +33,7 @@ class Textprocessed():
                         return "erreur problème: Plusieurs références ! "  #TODO enlever cette partie non disruptive 
                 else:
                     if temp.count("Reference") == 1: 
-                        keyword = str(keyword[0]) 
-                        index = temp.index(keyword) # check ici parcequ'il y a plusieurs versions de références 
+                        index = temp.index("Reference") # check ici parcequ'il y a plusieurs versions de références 
                         result = temp[index +len(keyword):]
                         return result
                     else: 
