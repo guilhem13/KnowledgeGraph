@@ -8,7 +8,9 @@ class Papier():
     summary = None,
     entities_from_reference = None,
     entities_include_in_text = None, 
-    subject = None  
+    subject = None
+    url_in_text = None
+    doi_in_text = None  
 
     def __init__(self,title,authors,link,summary):
 

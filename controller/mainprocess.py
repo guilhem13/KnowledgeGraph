@@ -71,21 +71,6 @@ class Pipeline():
         f.close()
         return True#arxiv_data"""
 
-    """
-    def make_traitement_pipeline(self): #https://export.arxiv.org/pdf/
-        arxiv_data = Data.get_set_data(self.start)
-        f = open("test.json", "a")
-        for i in range(len(arxiv_data)):
-            processor = Textprocessed(arxiv_data[i].link[0])            
-            text_processed = processor.get_data_from_pdf()
-            arxiv_data[i].entities_include_in_text = processor.find_entities_in_raw_text()
-            arxiv_data[i].entities_from_reference = self.get_references(text_processed)
-            #TODO arxiv_data[i].subject 
-            f.write(json.dumps(arxiv_data[i].__dict__))
-        f.close()
-        return True
-    """
-    
 ###########################################################################################################
     def multi_process(self, data, out_queue):
         if urllib.request.urlopen("http://172.17.0.3:5000/"):       
@@ -93,6 +78,8 @@ class Pipeline():
             text_processed = processor.get_data_from_pdf()
             data.entities_include_in_text = processor.find_entities_in_raw_text()
             data.entities_from_reference = self.get_references(text_processed)
+            data.url_in_text = processor.find_url_in_text()
+            data.doi_in_text = processor.find_doi_in_text()
             out_queue.put(data)
 
     
