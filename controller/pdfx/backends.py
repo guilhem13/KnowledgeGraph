@@ -15,7 +15,6 @@ import chardet
 
 # Find URLs in text via regex
 from . import extractor
-from .libs.xmp import xmp_to_dict
 
 # Setting `psparser.STRICT` is the first thing to do because it is
 # referenced in the other pdfparser modules
