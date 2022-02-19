@@ -24,17 +24,15 @@ class Pipeline():
         self.start =start
         pass
     
-    def get_references(self, textprocessed): 
+    def get_references(self, textprocessed): #spacyresult = spacymodel.spacylist(textprocessed)
 
         nltkresult = nltkmodel.nltktreelist(textprocessed)["persons"]
         Standfordresult = standfordnermodel.get_continuous_chunks(textprocessed)["persons"]
-        #spacyresult = spacymodel.spacylist(textprocessed)
         resultList= list(set(nltkresult) | set(Standfordresult))
-        #resultList = list(set(resultList) | set(spacyresult))
         resultList = [x for x in nltkresult if len(x)>1 ]
         #return nltkresult
         return resultList
-
+    
         #TODO A voir les modèles ne marche pas 
     def redis_string(self):
         try: 
@@ -73,13 +71,14 @@ class Pipeline():
 
 ###########################################################################################################
     def multi_process(self, data, out_queue):
-        if urllib.request.urlopen("http://172.17.0.3:5000/"):       
+        if urllib.request.urlopen("http://172.17.0.3:5000/"):
+            print(data.link[0])       
             processor = Textprocessed(data.link[0])            
             text_processed = processor.get_data_from_pdf()
             data.entities_include_in_text = processor.find_entities_in_raw_text()
             data.entities_from_reference = self.get_references(text_processed)
             data.url_in_text = processor.find_url_in_text()
-            data.doi_in_text = processor.find_doi_in_text()
+            data.doi_in_text = processor.find_doi_in_text()#frfr
             out_queue.put(data)
 
     

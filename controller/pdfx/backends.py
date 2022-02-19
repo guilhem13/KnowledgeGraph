@@ -303,19 +303,4 @@ class PDFMinerBackend(ReaderBackend):
                 # print("->", a["A"]["URI"])
                 return Reference(obj_resolved["A"]["URI"].decode("utf-8"), self.curpage)
 
-"""
-class TextBackend(ReaderBackend):
-    def __init__(self, stream):
-        ReaderBackend.__init__(self)
-        self.text = stream.read()
 
-        # Extract URL references from text
-        for url in extractor.extract_urls(self.text):
-            self.references.add(Reference(url))
-
-        for ref in extractor.extract_arxiv(self.text):
-            self.references.add(Reference(ref))
-
-        for ref in extractor.extract_doi(self.text):
-            self.references.add(Reference(ref))
-"""

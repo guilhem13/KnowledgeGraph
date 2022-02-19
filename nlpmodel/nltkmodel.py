@@ -1,9 +1,4 @@
 import nltk 
-#nltk.download('punkt')
-#nltk.download('averaged_perceptron_tagger')
-#nltk.download('maxent_ne_chunker')
-#nltk.download('words')
-#TODO ici faudra bien mettre les nltk.dowloads car ça va s'ajouter à chaque fois. Du moins pour chaque instance 
 
 def nltktreelist(text):
     from operator import itemgetter
