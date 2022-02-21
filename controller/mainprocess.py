@@ -71,7 +71,7 @@ class Pipeline():
 
 ###########################################################################################################
     def multi_process(self, data, out_queue):
-        if urllib.request.urlopen("http://172.17.0.3:5000/"):
+        if urllib.request.urlopen("http://172.17.0.2:5000/"):
             print(data.link[0])       
             processor = Textprocessed(data.link[0])            
             text_processed = processor.get_data_from_pdf()
