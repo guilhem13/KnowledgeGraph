@@ -15,6 +15,7 @@ import chardet
 
 # Find URLs in text via regex
 from . import extractor
+from .libs.xmp import xmp_to_dict
 
 # Setting `psparser.STRICT` is the first thing to do because it is
 # referenced in the other pdfparser modules
@@ -203,7 +204,7 @@ class PDFMinerBackend(ReaderBackend):
             metadata = resolve1(doc.catalog["Metadata"]).get_data()
             # print(metadata)  # The raw XMP metadata
             # print(xmp_to_dict(metadata))
-            #self.metadata.update(xmp_to_dict(metadata))
+            self.metadata.update(xmp_to_dict(metadata))
             # print("---")
 
         # Extract Content
@@ -304,3 +305,17 @@ class PDFMinerBackend(ReaderBackend):
                 return Reference(obj_resolved["A"]["URI"].decode("utf-8"), self.curpage)
 
 
+class TextBackend(ReaderBackend):
+    def __init__(self, stream):
+        ReaderBackend.__init__(self)
+        self.text = stream.read()
+
+        # Extract URL references from text
+        for url in extractor.extract_urls(self.text):
+            self.references.add(Reference(url))
+
+        for ref in extractor.extract_arxiv(self.text):
+            self.references.add(Reference(ref))
+
+        for ref in extractor.extract_doi(self.text):
+            self.references.add(Reference(ref))
