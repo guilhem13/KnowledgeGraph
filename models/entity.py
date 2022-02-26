@@ -5,10 +5,17 @@ class Entity():
     nom = None
     doi = None, #list of DOI where he works   
 
-    def __init__(self,prenom, nom,doi):
+    def __init__(self):
 
-        self.prenom = prenom,
-        self.nom =nom,
-        self.doi = doi
-        
+        pass
+
+    # setter method
+    def set_prenom(self, x):
+        self.prenom = x    
+    
+    def set_nom(self, x):
+        self.nom = x
+
+    def set_doi(self, x):
+        self.doi = x      
    

@@ -1,7 +1,7 @@
 from pickle import TRUE
 from unittest import result
 from controller import Data , Textprocessed
-from nlpmodel import nltkmodel , standfordnermodel ,spacymodel
+from nlpmodel import service_one_extraction
 from multiprocessing.pool import ThreadPool as Pool #TODO A enlever 
 import json
 import redis 
@@ -21,15 +21,6 @@ class Pipeline():
         self.arxiv_url = arxiv_url
         self.start =start
         pass
-    
-    def get_references(self, textprocessed): #spacyresult = spacymodel.spacylist(textprocessed)
-
-        nltkresult = nltkmodel.nltktreelist(textprocessed)["persons"]
-        Standfordresult = standfordnermodel.get_continuous_chunks(textprocessed)["persons"]
-        resultList= list(set(nltkresult) | set(Standfordresult))
-        resultList = [x for x in nltkresult if len(x)>1 ]
-        #return nltkresult
-        return resultList
 
 ###########################################################################################################
 
@@ -65,7 +56,7 @@ class Pipeline():
             processor = Textprocessed(data.link[0])            
             text_processed = processor.get_data_from_pdf()
             data.entities_include_in_text = processor.find_entities_in_raw_text()
-            data.entities_from_reference = self.get_references(text_processed)
+            data.entities_from_reference = service_one_extraction.get_references(text_processed)
             data.url_in_text = processor.find_url_in_text()
             data.doi_in_text = processor.find_doi_in_text()#frfr
             out_queue.put(data)
