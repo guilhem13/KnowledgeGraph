@@ -11,8 +11,6 @@ import urllib.request
 import threading
 from multiprocessing import cpu_count
 
-redis_host = "localhost"
-redis_port = 6379
 
 
 class Pipeline():
@@ -32,17 +30,10 @@ class Pipeline():
         resultList = [x for x in nltkresult if len(x)>1 ]
         #return nltkresult
         return resultList
-    
-        #TODO A voir les modèles ne marche pas 
-    def redis_string(self):
-        try: 
-            r = redis.StrictRedis(host = redis_host,port = redis_port, decode_responses=True)
-            r.set("message","Hello_World")
-            msg =r.get("message")
-            print(msg)
-        except Exception as e: 
-            print(e)
 
+###########################################################################################################
+
+    """
     def worker(self, item):
         try:
             processor = Textprocessed(item.link[0])            
@@ -52,9 +43,6 @@ class Pipeline():
         except Exception as e:
             print(e)
             print('error with item')
-    #TODO 
-    #https://docs.python.org/2/library/multiprocessing.html#using-a-pool-of-workers
-    #https://stackoverflow.com/questions/15143837/how-to-multi-thread-an-operation-within-a-loop-in-python
     
     def multi_threading(self,pool_size):
         arxiv_data = Data.get_set_data(self.start)
@@ -70,6 +58,7 @@ class Pipeline():
         return True#arxiv_data"""
 
 ###########################################################################################################
+
     def multi_process(self, data, out_queue):
         if urllib.request.urlopen("http://172.17.0.2:5000/"):
             print(data.link[0])       
@@ -82,9 +71,10 @@ class Pipeline():
             out_queue.put(data)
 
     
-    def make_traitement_pipeline(self,out_queue): 
-        arxiv_data = Data.get_set_data(self.start)
+    def make_traitement_pipeline(self,nb_paper,out_queue): 
+        arxiv_data = Data(nb_paper).get_set_data()
         res_lst = []
+        """
         f = open("test.json", "a")
         for i in range(0,len(arxiv_data),20):
             print(i)
@@ -103,7 +93,7 @@ class Pipeline():
 
         #for test in res_lst: 
         #   f.write(json.dumps(test.__dict__))
-        f.close()
+        f.close()"""
      # TODO récolter le nombre de coeur pour ensuite le mettre sur le code
      # gérer le problème quand c'est 10000  
      #https://blog.ruanbekker.com/blog/2019/02/19/parallel-processing-with-python-and-multiprocessing-using-queue/

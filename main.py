@@ -1,22 +1,16 @@
 from controller import Pipeline
 import nltk
-import multiprocessing 
 nltk.download('punkt')
 nltk.download('averaged_perceptron_tagger')
 nltk.download('maxent_ne_chunker')
 nltk.download('words')
-import urllib.request
-from xml.etree.ElementTree import fromstring, ElementTree
-def main ():
-    pass
+import multiprocessing as mp
 
 def main_function():
 
     p = Pipeline("https://export.arxiv.org/pdf/",0)
-    #return p.multi_threading(5)
-    import multiprocessing as mp
     out_queue = mp.Queue()
-    return p.make_traitement_pipeline(out_queue)
+    return p.make_traitement_pipeline(10, out_queue)
 
 if __name__ == '__main__':
     

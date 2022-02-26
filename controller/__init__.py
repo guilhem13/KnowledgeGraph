@@ -1,3 +1,3 @@
-from .arxiv import Data
-from .processingpipeline import Textprocessed 
-from .mainprocess import Pipeline
+from .data.arxiv import Data
+from .pipeline.processingpipeline import Textprocessed 
+from .pipeline.mainprocess import Pipeline

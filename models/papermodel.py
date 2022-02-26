@@ -1,8 +1,8 @@
-from redis_om import HashModel
 
 class Papier():
 
     title = None,
+    doi = None
     authors = None,
     link = None,
     summary = None,
@@ -12,9 +12,10 @@ class Papier():
     url_in_text = None
     doi_in_text = None  
 
-    def __init__(self,title,authors,link,summary):
+    def __init__(self,title,doi,authors,link,summary):
 
         self.title = title,
+        self.doi = doi, 
         self.authors = authors,
         self.link = link,
         self.summary = summary
