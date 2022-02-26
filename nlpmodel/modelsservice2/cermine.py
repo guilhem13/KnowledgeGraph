@@ -1,5 +1,6 @@
 import requests
 from xml.etree.ElementTree import fromstring, ElementTree
+from models import Entity
 
 class Cermine():
 
@@ -23,10 +24,12 @@ class Cermine():
         for child in root.find("./back/ref-list"):
             for persons in child.findall('mixed-citation/string-name'):
                 for person in persons:
-                    p 
+                    p = Entity()
                     if person.tag == 'given-names':
-                        a.append(person.text)
-                    else: 
-                        print(person)
-                    #print(person.get('given-names'))
-        #TODO ici convertir en modèle de donnée Entity 
+                        p.set_prenom(person.text)
+                    if person.tag =='surname': 
+                        p.set_nom(person.text)
+                    result.append(p)
+                    
+        return result
+       
