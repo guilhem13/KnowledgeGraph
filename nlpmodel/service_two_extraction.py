@@ -13,6 +13,7 @@ class ServiceTwo():
             and self.nom==other.nom
 
     def get_references(self): 
-        grobid_result = Grobid(self.path).get_entities()
+        #grobid_result = Grobid(self.path).get_entities()
         cermine_result = Cermine(self.path).get_entities()
-        murge_list = list(set(grobid_result + cermine_result))
+        #murge_list = list(set(grobid_result + cermine_result))
+        return cermine_result
