@@ -1,7 +1,7 @@
 from pickle import TRUE
 from unittest import result
 from controller import Data , Textprocessed
-from nlpmodel import service_one_extraction
+from nlpmodel import service_one_extraction, service_two_extraction
 from multiprocessing.pool import ThreadPool as Pool #TODO A enlever 
 import json
 import redis 
@@ -10,6 +10,7 @@ import multiprocessing as mp
 import urllib.request
 import threading
 from multiprocessing import cpu_count
+import os 
 
 
 
@@ -51,31 +52,36 @@ class Pipeline():
 ###########################################################################################################
 
     def multi_process(self, data, out_queue):
-        if urllib.request.urlopen("http://172.17.0.2:5000/"):
+        #if urllib.request.urlopen("http://172.17.0.2:5000/"):
             print(data.link[0])       
             processor = Textprocessed(data.link[0])            
             text_processed = processor.get_data_from_pdf()
             data.entities_include_in_text = processor.find_entities_in_raw_text()
-            data.entities_from_reference = service_one_extraction.get_references(text_processed)
+            #data.entities_from_reference = service_one_extraction.ServiceOne(text_processed).get_references()
+            #data.entities_from_reference = service_two_extraction.ServiceTwo(str("file/"+data.doi[0]+".pdf")).get_references()
+            #a = service_one_extraction.ServiceOne(text_processed).get_references()
+            a = service_two_extraction.ServiceTwo(str("file/"+data.doi[0]+".pdf")).get_references()
+            b = [ x.__dict__ for x in a ]
+            data.entities_from_reference = b             
             data.url_in_text = processor.find_url_in_text()
             data.doi_in_text = processor.find_doi_in_text()#frfr
+            os.remove(str("file/"+data.doi[0]+".pdf"))
             out_queue.put(data)
 
     
     def make_traitement_pipeline(self,nb_paper,out_queue): 
         arxiv_data = Data(nb_paper).get_set_data()
-        res_lst = []
-        """
+        res_lst = []        
         f = open("test.json", "a")
-        for i in range(0,len(arxiv_data),20):
+        for i in range(0,len(arxiv_data),5):
             print(i)
-            temp =arxiv_data[i:i+20]
+            temp =arxiv_data[i:i+5]
             workers = [ mp.Process(target=self.multi_process, args=(ele, out_queue) ) for ele in temp]
             #s = threading.Semaphore(4)
             for work in workers:
                 #with s:
                 work.start()
-            for work in workers: work.join(timeout=3)
+            for work in workers: work.join(timeout=5)
 
             #res_lst = []
             for j in range(len(workers)):
@@ -84,7 +90,7 @@ class Pipeline():
 
         #for test in res_lst: 
         #   f.write(json.dumps(test.__dict__))
-        f.close()"""
+        f.close()
      # TODO récolter le nombre de coeur pour ensuite le mettre sur le code
      # gérer le problème quand c'est 10000  
      #https://blog.ruanbekker.com/blog/2019/02/19/parallel-processing-with-python-and-multiprocessing-using-queue/

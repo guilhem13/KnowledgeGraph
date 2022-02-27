@@ -14,8 +14,7 @@ from re import compile
 import chardet
 
 # Find URLs in text via regex
-from . import extractor
-from .libs.xmp import xmp_to_dict
+#from . import extractor
 
 # Setting `psparser.STRICT` is the first thing to do because it is
 # referenced in the other pdfparser modules
@@ -92,7 +91,7 @@ class Reference(object):
             return
 
         # Detect reftype by extractor
-        arxiv = extractor.extract_arxiv(uri)
+        """arxiv = extractor.extract_arxiv(uri)
         if arxiv:
             self.ref = arxiv.pop()
             self.reftype = "arxiv"
@@ -102,7 +101,7 @@ class Reference(object):
         if doi:
             self.ref = doi.pop()
             self.reftype = "doi"
-            return
+            return"""
 
     def __hash__(self):
         return hash(self.ref)
@@ -162,7 +161,7 @@ class ReaderBackend(object):
 
     def get_text(self):
         return self.text
-
+    """
     def get_references(self, reftype=None, sort=False):
         refs = self.references
         if reftype:
@@ -179,7 +178,7 @@ class ReaderBackend(object):
                 ret[r.reftype].append(r.ref)
             else:
                 ret[r.reftype] = [r.ref]
-        return ret
+        return ret"""
 
 
 class PDFMinerBackend(ReaderBackend):
@@ -204,7 +203,7 @@ class PDFMinerBackend(ReaderBackend):
             metadata = resolve1(doc.catalog["Metadata"]).get_data()
             # print(metadata)  # The raw XMP metadata
             # print(xmp_to_dict(metadata))
-            self.metadata.update(xmp_to_dict(metadata))
+            #self.metadata.update(xmp_to_dict(metadata))
             # print("---")
 
         # Extract Content
@@ -246,7 +245,7 @@ class PDFMinerBackend(ReaderBackend):
             # logger.warning(str(e))
 
         # Remove empty metadata entries
-        self.metadata_cleanup()
+        """self.metadata_cleanup()"""
 
         # Get text from stream
         self.text = text_io.getvalue().decode("utf-8")
@@ -255,6 +254,7 @@ class PDFMinerBackend(ReaderBackend):
         # print(self.text)
 
         # Extract URL references from text
+        """
         for url in extractor.extract_urls(self.text):
             self.references.add(Reference(url, self.curpage))
 
@@ -262,7 +262,7 @@ class PDFMinerBackend(ReaderBackend):
             self.references.add(Reference(ref, self.curpage))
 
         for ref in extractor.extract_doi(self.text):
-            self.references.add(Reference(ref, self.curpage))
+            self.references.add(Reference(ref, self.curpage))"""
 
     def resolve_PDFObjRef(self, obj_ref):
         """
@@ -305,17 +305,3 @@ class PDFMinerBackend(ReaderBackend):
                 return Reference(obj_resolved["A"]["URI"].decode("utf-8"), self.curpage)
 
 
-class TextBackend(ReaderBackend):
-    def __init__(self, stream):
-        ReaderBackend.__init__(self)
-        self.text = stream.read()
-
-        # Extract URL references from text
-        for url in extractor.extract_urls(self.text):
-            self.references.add(Reference(url))
-
-        for ref in extractor.extract_arxiv(self.text):
-            self.references.add(Reference(ref))
-
-        for ref in extractor.extract_doi(self.text):
-            self.references.add(Reference(ref))

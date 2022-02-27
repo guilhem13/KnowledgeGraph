@@ -10,7 +10,7 @@ def main_function():
 
     p = Pipeline("https://export.arxiv.org/pdf/",0)
     out_queue = mp.Queue()
-    return p.make_traitement_pipeline(10, out_queue)
+    return p.make_traitement_pipeline(3, out_queue)
 
 if __name__ == '__main__':
     

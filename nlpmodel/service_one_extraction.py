@@ -72,8 +72,16 @@ class ServiceOne():
         result =[]
         for i in range(len(liste)):
             temp = liste[i].split(" ")
-            result.append(Entity(temp[0],temp[1]))
-
+            if len(temp) >1:
+                p = Entity()
+                p.set_prenom(temp[0])
+                p.set_nom(temp[1])
+                result.append(p)
+            else: 
+                p = Entity()
+                p.set_prenom(None)
+                p.set_nom(temp[0])
+                result.append(p) #TODO parfois le retour n'est pas prenom nom il faut donc gérer ce porblème 
         return result 
 
     def get_references(self):

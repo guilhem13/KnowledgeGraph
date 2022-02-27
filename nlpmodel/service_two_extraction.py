@@ -1,5 +1,5 @@
-from modelsservice2.cermine import Cermine
-from modelsservice2.grobid import Grobid
+from .modelsservice2.cermine import Cermine
+from .modelsservice2.grobid import Grobid
 
 class ServiceTwo():
 
@@ -12,7 +12,7 @@ class ServiceTwo():
         return self.prenom==other.prenom\
             and self.nom==other.nom
 
-    def get_result_from_model(self): 
+    def get_references(self): 
         grobid_result = Grobid(self.path).get_entities()
         cermine_result = Cermine(self.path).get_entities()
         murge_list = list(set(grobid_result + cermine_result))

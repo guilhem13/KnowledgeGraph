@@ -1,88 +1,28 @@
-# -*- coding: utf-8 -*-
-"""
-Extract metadata and links from a local or remote PDF, and
-optionally download all referenced PDFs.
 
-Features
 
-* Extract metadata and PDF URLs from a given PDF
-* Download all PDFs referenced in the original PDF
-* Works with local and online pdfs
-* Use as command-line tool or Python package
-* Compatible with Python 2 and 3
+#from __future__ import absolute_import, division, print_function, unicode_literals
 
-Usage
 
-PDFx can be used to extract infos from PDF in two ways:
-
-* Command line tool `pdfx`
-* Python library `import pdfx`
-
->>> import pdfx
->>> pdf = pdfx.PDFx("filename-or-url.pdf")
->>> metadata = pdf.get_metadata()
->>> references_list = pdf.get_references()
->>> references_dict = pdf.get_references_as_dict()
->>> pdf.download_pdfs("target-directory")
-
-https://www.metachris.com/pdfx
-
-Copyright (c) 2015, Chris Hager <chris@linuxuser.at>
-License: GPLv3
-"""
-from __future__ import absolute_import, division, print_function, unicode_literals
-
-__title__ = "pdfx"
-__version__ = "1.4.1"
-__author__ = "Chris Hager"
-__license__ = "Apache 2.0"
-__copyright__ = "Copyright 2015 Chris Hager"
 
 import os
-import sys
-import json
-import shutil
 import logging
+import regex as re 
 
-
-from .extractor import extract_urls
-from .backends import PDFMinerBackend, TextBackend
-from .downloader import download_urls
-from .exceptions import FileNotFoundError, DownloadError, PDFInvalidError
+#from .extractor import extract_urls
+from .backends import PDFMinerBackend
+from .exceptions import FileNotFoundError, PDFInvalidError
 from pdfminer.pdfparser import PDFSyntaxError
 
+from io import BytesIO
+from urllib.request import Request, urlopen
 
-IS_PY2 = sys.version_info < (3, 0)
-
-if IS_PY2:
-    # Python 2
-    from cStringIO import StringIO as BytesIO
-    from urllib2 import Request, urlopen
-else:
-    # Python 3
-    from io import BytesIO
-    from urllib.request import Request, urlopen
-
-    unicode = str
+unicode = str
 
 logger = logging.getLogger(__name__)
 
 
 class PDFx(object):
-    """
-    Main class which extracts infos from PDF
 
-    General flow:
-    * init -> get_metadata()
-
-    In detail:
-    >>> import pdfx
-    >>> pdf = pdfx.PDFx("filename-or-url.pdf")
-    >>> print(pdf.get_metadata())
-    >>> print(pdf.get_tet())
-    >>> print(pdf.get_references())
-    >>> pdf.download_pdfs("target-directory")
-    """
 
     # Available after init
     uri = None  # Original URI
@@ -103,6 +43,11 @@ class PDFx(object):
 
         self.uri = uri
 
+        # URL
+        URL_REGEX = r"""(?i)\b((?:https?:(?:/{1,3}|[a-z0-9%])|[a-z0-9.\-]+[.](?:com|net|org|edu|gov|mil|aero|asia|biz|cat|coop|info|int|jobs|mobi|museum|name|post|pro|tel|travel|xxx|ac|ad|ae|af|ag|ai|al|am|an|ao|aq|ar|as|at|au|aw|ax|az|ba|bb|bd|be|bf|bg|bh|bi|bj|bm|bn|bo|br|bs|bt|bv|bw|by|bz|ca|cc|cd|cf|cg|ch|ci|ck|cl|cm|cn|co|cr|cs|cu|cv|cx|cy|cz|dd|de|dj|dk|dm|do|dz|ec|ee|eg|eh|er|es|et|eu|fi|fj|fk|fm|fo|fr|ga|gb|gd|ge|gf|gg|gh|gi|gl|gm|gn|gp|gq|gr|gs|gt|gu|gw|gy|hk|hm|hn|hr|ht|hu|id|ie|il|im|in|io|iq|ir|is|it|je|jm|jo|jp|ke|kg|kh|ki|km|kn|kp|kr|kw|ky|kz|la|lb|lc|li|lk|lr|ls|lt|lu|lv|ly|ma|mc|md|me|mg|mh|mk|ml|mm|mn|mo|mp|mq|mr|ms|mt|mu|mv|mw|mx|my|mz|na|nc|ne|nf|ng|ni|nl|no|np|nr|nu|nz|om|pa|pe|pf|pg|ph|pk|pl|pm|pn|pr|ps|pt|pw|py|qa|re|ro|rs|ru|rw|sa|sb|sc|sd|se|sg|sh|si|sj|Ja|sk|sl|sm|sn|so|sr|ss|st|su|sv|sx|sy|sz|tc|td|tf|tg|th|tj|tk|tl|tm|tn|to|tp|tr|tt|tv|tw|tz|ua|ug|uk|us|uy|uz|va|vc|ve|vg|vi|vn|vu|wf|ws|ye|yt|yu|za|zm|zw)/)(?:[^\s()<>{}\[\]]+|\([^\s()]*?\([^\s()]+\)[^\s()]*?\)|\([^\s]+?\))+(?:\([^\s()]*?\([^\s()]+\)[^\s()]*?\)|\([^\s]+?\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’])|(?:(?<!@)[a-z0-9]+(?:[.\-][a-z0-9]+)*[.](?:com|net|org|edu|gov|mil|aero|asia|biz|cat|coop|info|int|jobs|mobi|museum|name|post|pro|tel|travel|xxx|ac|ad|ae|af|ag|ai|al|am|an|ao|aq|ar|as|at|au|aw|ax|az|ba|bb|bd|be|bf|bg|bh|bi|bj|bm|bn|bo|br|bs|bt|bv|bw|by|bz|ca|cc|cd|cf|cg|ch|ci|ck|cl|cm|cn|co|cr|cs|cu|cv|cx|cy|cz|dd|de|dj|dk|dm|do|dz|ec|ee|eg|eh|er|es|et|eu|fi|fj|fk|fm|fo|fr|ga|gb|gd|ge|gf|gg|gh|gi|gl|gm|gn|gp|gq|gr|gs|gt|gu|gw|gy|hk|hm|hn|hr|ht|hu|id|ie|il|im|in|io|iq|ir|is|it|je|jm|jo|jp|ke|kg|kh|ki|km|kn|kp|kr|kw|ky|kz|la|lb|lc|li|lk|lr|ls|lt|lu|lv|ly|ma|mc|md|me|mg|mh|mk|ml|mm|mn|mo|mp|mq|mr|ms|mt|mu|mv|mw|mx|my|mz|na|nc|ne|nf|ng|ni|nl|no|np|nr|nu|nz|om|pa|pe|pf|pg|ph|pk|pl|pm|pn|pr|ps|pt|pw|py|qa|re|ro|rs|ru|rw|sa|sb|sc|sd|se|sg|sh|si|sj|Ja|sk|sl|sm|sn|so|sr|ss|st|su|sv|sx|sy|sz|tc|td|tf|tg|th|tj|tk|tl|tm|tn|to|tp|tr|tt|tv|tw|tz|ua|ug|uk|us|uy|uz|va|vc|ve|vg|vi|vn|vu|wf|ws|ye|yt|yu|za|zm|zw)\b/?(?!@)))"""  # noqa: E501
+
+        def extract_urls(text):
+            return set(re.findall(URL_REGEX, text, re.IGNORECASE))
         # Find out whether pdf is an URL or local file
         url = extract_urls(uri)
         self.is_url = len(url)
@@ -115,7 +60,12 @@ class PDFx(object):
                 content = urlopen(Request(uri)).read()
                 self.stream = BytesIO(content)
             except Exception as e:
-                raise DownloadError("Error downloading '%s' (%s)" % (uri, unicode(e)))
+                print("Pas bon ")
+            try: 
+                with open(str("file/"+self.fn+".pdf"), 'wb') as f:
+                    f.write(content)
+            except Exception as e : 
+                print("N'enregistre pas le fichier")
 
         else:
             if not os.path.isfile(uri):
@@ -128,79 +78,10 @@ class PDFx(object):
             self.reader = PDFMinerBackend(self.stream)
         except PDFSyntaxError as e:
             raise PDFInvalidError("Invalid PDF (%s)" % unicode(e))
-
-            # Could try to create a TextReader
-            logger.info(unicode(e))
-            logger.info("Trying to create a TextReader backend...")
-            self.stream.seek(0)
-            self.reader = TextBackend(self.stream)
-            self.is_pdf = False
         except Exception as e:
             raise
-            raise PDFInvalidError("Invalid PDF (%s)" % unicode(e))
-
-        # Save metadata to user-supplied directory
-        self.summary = {
-            "source": {
-                "type": "url" if self.is_url else "file",
-                "location": self.uri,
-                "filename": self.fn,
-            },
-            "metadata": self.reader.get_metadata(),
-        }
-
-        # Search for URLs
-        self.summary["references"] = self.reader.get_references_as_dict()
-        # print(self.summary)
-
+    
     def get_text(self):
         return self.reader.get_text()
-
-    def get_metadata(self):
-        return self.reader.get_metadata()
-
-    def get_references(self, reftype=None, sort=False):
-        """ reftype can be `None` for all, `pdf`, etc. """
-        return self.reader.get_references(reftype=reftype, sort=sort)
-
-    def get_references_as_dict(self, reftype=None, sort=False):
-        """ reftype can be `None` for all, `pdf`, etc. """
-        return self.reader.get_references_as_dict(reftype=reftype, sort=sort)
-
-    def get_references_count(self, reftype=None):
-        """ reftype can be `None` for all, `pdf`, etc. """
-        r = self.reader.get_references(reftype=reftype)
-        return len(r)
-
-    def download_pdfs(self, target_dir):
-        logger.debug("Download pdfs to %s" % target_dir)
-        assert target_dir, "Need a download directory"
-        assert not os.path.isfile(target_dir), "Download directory is a file"
-
-        # Create output directory
-        if target_dir and not os.path.exists(target_dir):
-            os.makedirs(target_dir)
-            logger.debug("Created output directory '%s'" % target_dir)
-
-        # Save original PDF to user-supplied directory
-        fn = os.path.join(target_dir, self.fn)
-        with open(fn, "wb") as f:
-            self.stream.seek(0)
-            shutil.copyfileobj(self.stream, f)
-        logger.debug("- Saved original pdf as '%s'" % fn)
-
-        fn_json = "%s.infos.json" % fn
-        with open(fn_json, "w") as f:
-            f.write(json.dumps(self.summary, indent=2))
-        logger.debug("- Saved metadata to '%s'" % fn_json)
-
-        # Download references
-        urls = [ref.ref for ref in self.get_references("pdf")]
-        if not urls:
-            return
-
-        dir_referenced_pdfs = os.path.join(target_dir, "%s-referenced-pdfs" % self.fn)
-        logger.debug("Downloading %s referenced pdfs..." % len(urls))
-
-        # Download urls as a set to avoid duplicates
-        download_urls(urls, dir_referenced_pdfs)
+    def get_uri(self): 
+        return self.fn
