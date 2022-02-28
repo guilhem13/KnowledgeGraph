@@ -3,7 +3,7 @@ class Entity():
 
     prenom = None,
     nom = None
-    doi = None, #list of DOI where he works   
+    name = None, #TODO avant yavait le doi à voir si c'est ok pour le garder ou le laisser   
 
     def __init__(self):
 
@@ -16,6 +16,6 @@ class Entity():
     def set_nom(self, x):
         self.nom = x
 
-    def set_doi(self, x):
-        self.doi = x      
+    def set_name(self, x):
+        self.name = x      
    
