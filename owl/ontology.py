@@ -4,7 +4,7 @@ from xml.sax.saxutils import escape
 class Ontology():
 
     def __init__(self):
-        self.template_onto = get_ontology("file://owl/ontologie.owl").load()
+        self.template_onto = get_ontology("file://owl/onto3.owl").load()
         self.foaf = self.template_onto.get_imported_ontologies().first().load()
     
                 
@@ -15,17 +15,16 @@ class Ontology():
             document_object.doi.append(papier.title[0])
             document_object.doi.append(papier.link[0]) 
             
-            for entite in papier.authors: 
-                print(entite.nom)
+            for entite in papier.authors[0]: 
                 author_object = self.template_onto.Auteur(entite.nom)
                 author_object.firstName.append(entite.prenom)
                 author_object.lastName.append(entite.nom)
-                author_object.a_ecrit(document_object)
+                author_object.a_ecrit.append(document_object)
                 document_object.a_comme_auteur.append(author_object)
             
             for reference in papier.entities_from_reference: 
-
-                person = self._foaf.Person(reference.nom)
+                print(reference)
+                person = self.foaf.Person(reference.nom)
                 person.firstName.append(reference.prenom)
                 person.lastName.append(reference.nom)
                 person.est_reference_dans.append(document_object)

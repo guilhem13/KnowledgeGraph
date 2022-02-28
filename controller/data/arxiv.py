@@ -28,7 +28,7 @@ class Data():
                     p.set_prenom(seperate_name[0])
                     p.set_nom(seperate_name[1])
                     result.append(p)
-
+            print(result)
             return result
         else: 
             print("No authors on this paper")
