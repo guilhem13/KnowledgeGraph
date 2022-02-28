@@ -5,6 +5,7 @@ nltk.download('averaged_perceptron_tagger')
 nltk.download('maxent_ne_chunker')
 nltk.download('words')
 import multiprocessing as mp
+from owl import ontology
 
 def main_function():
 
@@ -14,5 +15,8 @@ def main_function():
 
 if __name__ == '__main__':
     
-    main_function()
-    
+    papiers = main_function()
+    owl = ontology.Ontology()
+    for papier in papiers: 
+        owl.add_papier(papier)
+    owl.save('result.owl')

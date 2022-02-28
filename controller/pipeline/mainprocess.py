@@ -60,9 +60,10 @@ class Pipeline():
             #data.entities_from_reference = service_one_extraction.ServiceOne(text_processed).get_references()
             #data.entities_from_reference = service_two_extraction.ServiceTwo(str("file/"+data.doi[0]+".pdf")).get_references()
             #a = service_one_extraction.ServiceOne(text_processed).get_references()
-            a = service_two_extraction.ServiceTwo(str("file/"+data.doi[0]+".pdf")).get_references()
-            b = [ x.__dict__ for x in a ]
-            data.entities_from_reference = b             
+            #a = service_two_extraction.ServiceTwo(str("file/"+data.doi[0]+".pdf")).get_references()
+            #b = [ x.__dict__ for x in a ]
+            #data.entities_from_reference = b
+            data.entities_from_reference = service_one_extraction.ServiceOne(text_processed).get_references()         
             data.url_in_text = processor.find_url_in_text()
             data.doi_in_text = processor.find_doi_in_text()#frfr
             os.remove(str("file/"+data.doi[0]+".pdf"))
@@ -72,7 +73,7 @@ class Pipeline():
     def make_traitement_pipeline(self,nb_paper,out_queue): 
         arxiv_data = Data(nb_paper).get_set_data()
         res_lst = []        
-        f = open("test.json", "a")
+        #f = open("test.json", "a")
         for i in range(0,len(arxiv_data),5):
             print(i)
             temp =arxiv_data[i:i+5]
@@ -85,12 +86,13 @@ class Pipeline():
 
             #res_lst = []
             for j in range(len(workers)):
-                #res_lst.append(out_queue.get())
-                f.write(json.dumps(out_queue.get().__dict__))
+                res_lst.append(out_queue.get())
+                #f.write(json.dumps(out_queue.get().__dict__))
 
         #for test in res_lst: 
         #   f.write(json.dumps(test.__dict__))
-        f.close()
+        #f.close()
+        return res_lst
      # TODO récolter le nombre de coeur pour ensuite le mettre sur le code
      # gérer le problème quand c'est 10000  
      #https://blog.ruanbekker.com/blog/2019/02/19/parallel-processing-with-python-and-multiprocessing-using-queue/

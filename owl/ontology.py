@@ -1,25 +1,37 @@
 from owlready2 import get_ontology
+from xml.sax.saxutils import escape
 
 class Ontology():
 
     def __init__(self):
-        self._template_onto = get_ontology("file://owl/ontologie.owl").load()
-        self._foaf = self._template_onto.get_imported_ontologies().first().load()
-
-    def _add_authors(self, authors, arxiv_document):
-        
-        for author in authors:
-            with self._template_onto:
+        self.template_onto = get_ontology("file://owl/ontologie.owl").load()
+        self.foaf = self.template_onto.get_imported_ontologies().first().load()
+    
                 
-    def add_document(self, document):
-        
-       
+    def add_papier(self, papier):
+         with self.template_onto:
+            document_object = self.template_onto.Papier(escape(papier.doi[0]))
+            document_object.doi.append(papier.doi[0])
+            document_object.doi.append(papier.title[0])
+            document_object.doi.append(papier.link[0]) 
+            
+            for entite in papier.authors: 
+                print(entite.nom)
+                author_object = self.template_onto.Auteur(entite.nom)
+                author_object.firstName.append(entite.prenom)
+                author_object.lastName.append(entite.nom)
+                author_object.a_ecrit(document_object)
+                document_object.a_comme_auteur.append(author_object)
+            
+            for reference in papier.entities_from_reference: 
 
-    def add_named_entity(self, named_entity, arxiv_document):
-        
-       
+                person = self._foaf.Person(reference.nom)
+                person.firstName.append(reference.prenom)
+                person.lastName.append(reference.nom)
+                person.est_reference_dans.append(document_object)
+                document_object.a_comme_reference.append(person)
 
     def save(self,filepath):
         
-        self._template_onto.save(filepath)
+        self.template_onto.save(filepath)
 
