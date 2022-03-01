@@ -23,7 +23,6 @@ class Ontology():
                 document_object.a_comme_auteur.append(author_object)
             
             for reference in papier.entities_from_reference: 
-                print(reference)
                 person = self.foaf.Person(reference.nom)
                 person.firstName.append(reference.prenom)
                 person.lastName.append(reference.nom)

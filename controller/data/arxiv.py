@@ -28,7 +28,6 @@ class Data():
                     p.set_prenom(seperate_name[0])
                     p.set_nom(seperate_name[1])
                     result.append(p)
-            print(result)
             return result
         else: 
             print("No authors on this paper")
@@ -39,7 +38,7 @@ class Data():
         client_arxiv = arxiv.Client(page_size =self.count,delay_seconds = 3,num_retries = 5)
         paper_list= []
         for result in client_arxiv.results(arxiv.Search(query = "cat:cs.AI",max_results =self.count,sort_by = arxiv.SortCriterion.SubmittedDate,)):
-            paper_list.append(Papier(result.title,self.get_doi(result.entry_id),self.process_authors(result.authors),result.pdf_url,result.summary))
+            paper_list.append(Papier(result.title,self.get_doi(result.entry_id),self.process_authors(result.authors),result.pdf_url,result.summary,result.published))
         
         return paper_list
         

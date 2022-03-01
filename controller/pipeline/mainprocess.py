@@ -10,7 +10,8 @@ import multiprocessing as mp
 import urllib.request
 import threading
 from multiprocessing import cpu_count
-import os 
+import os
+import time 
 
 
 
@@ -53,10 +54,17 @@ class Pipeline():
 
     def multi_process(self, data, out_queue):
         #if urllib.request.urlopen("http://172.17.0.2:5000/"):
-            print(data.link[0])       
+            #print(data.link[0])  
+            time.sleep(3)  
             processor = Textprocessed(data.link[0])            
             text_processed = processor.get_data_from_pdf()
             data.entities_include_in_text = processor.find_entities_in_raw_text()
+            """try: 
+                 data.entities_from_reference = service_two_extraction.ServiceTwo(str("file/"+data.doi[0]+".pdf")).get_references()
+            except Exception as e:
+                print("Service two didn't work ")
+                print(e)
+                data.entities_from_reference =service_one_extraction.ServiceOne(text_processed).get_references() """
             #data.entities_from_reference = service_one_extraction.ServiceOne(text_processed).get_references()
             #data.entities_from_reference = service_two_extraction.ServiceTwo(str("file/"+data.doi[0]+".pdf")).get_references()
             #a = service_one_extraction.ServiceOne(text_processed).get_references()
@@ -70,12 +78,11 @@ class Pipeline():
             out_queue.put(data)
 
     
-    def make_traitement_pipeline(self,nb_paper,out_queue): 
-        arxiv_data = Data(nb_paper).get_set_data()
+    def make_traitement_pipeline(self,block_paper,out_queue,batch_size): 
+        arxiv_data = block_paper
         res_lst = []        
         #f = open("test.json", "a")
-        for i in range(0,len(arxiv_data),5):
-            print(i)
+        for i in range(0,len(arxiv_data),batch_size):
             temp =arxiv_data[i:i+5]
             workers = [ mp.Process(target=self.multi_process, args=(ele, out_queue) ) for ele in temp]
             #s = threading.Semaphore(4)
